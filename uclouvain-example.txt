@@ -1,0 +1,154 @@
+For the basic networking class, the students have to analyse the tweaks that are used by a large webserver to improve 
+its performance. For this, they write a four-page report and I encourage them to look at various techniques that can be used 
+by operators (see below for the hints that I gave to the students). To help them check whether the website was using a CDN, 
+we used RIPE Atlas to query the DNS names for more than 1000 domain names and gave the raw data in JSON files to the students. 
+
+For this year, we could not ask the students to write scripts to interact with RIPE Atlas because 200+ students registered 
+to the courses and I did not want to manage 200 user names or give a credit to each student. 
+For next year, maybe we should install a proxy in our university that adds the required key to allow the students to 
+perform measurements without having the key. When we performed the measurements, we were blocked by the limit in 100 
+simultaneous measurements and had to divide the measurements in batches. 
+
+In advanced course where students perform measurements, it would be possible to ask the students to perform more 
+intelligent tests by building scripts.
+
+===================
+Information sent to the students for the project
+
+First week
+
+===
+
+For the second individual project, you will analyse in details a remote website by observing its responses over the Internet. Your objective is to write a short (4 pages) report that describes in details the key technical elements that you have found while interacting with this server.
+
+Connect to your web server by using a browser with developper extensions to be able to analyse in details the HTTP requests that are sent and the headers that are received. Try to identify the following information :
+list all the domain names that are accessed when retrieving a page from this web server. Store these names in a CSV file for next week.
+list all the different types of ressources (html, css, javascript, flash, …) that are retrieved. For each ressource, collect the size, type and server from which they are downloaded
+list the TCP port numbers that are used to contact the server (80, 443 for https, and other port numbers)
+For each HTTP request that you send, collect :
+the header lines that your browser sends (you should try with different browsers to see how the server reacts to different clients)
+the cookies that are used (do not only use your default browser because it could send cookies that you have accumulated while browsing other websites)
+Are there header lines that are non-standard ? If so, try to document their usage
+For each HTTP response that you receive, collect :
+the version of HTTP used by the server (1.0, 1.1,
+the header lines that are returned by the server and analyse them to see whether you find something strange in these replies
+Whenever possible, try to do some scenarios on the website that could lead to different behaviours, e.g. do a search in the website’s search box, try to register as an identified user, try to upload or download specific information from the website, ...
+During you analysis, try to detect anything which is unexpected and try to explain this strange behaviour. Your objective is to provide technical details about the precise operation of this particular website.
+
+We'll send you one email per week to inform you about the different points that you should address in your analysis.
+
+If you have questions, please post them on icampus
+
+====
+
+second week : DNS
+
+====
+
+The Domain Name System (DNS) plays a key role in the operation of Internet servers such as the web servers that you analyse for this project. For each important domain name that is used by servers that you analyse (not only the main web server, but also the other servers that could host some specific resources or advertisements, …) try to find the following :
+
+- What are the Name Servers (NS DNS record) that support this domain. Are they accessible over IPv6 and IPv4 or only one protocol ?
+- Do the domain names that you contact have only A records (IPv4) or both A and AAAA (records) ?
+- Do they use CNAMEs ?
+- What is the TTL of the DNS responses ?
+- Does the DNS resolver that you contact always return the same A/AAAA records or is there some form of load balancing in the DNS ?
+- Do all DNS resolvers provide the same answer to your request ? (If your web server is supported by a CDN, the DNS resolvers will probably reply with the address of a close CDN server)
+
+In cooperation with the RIPE Atlas measurement platform (http://atlas.ripe.net), we can help you to answer the last question by running DNS queries from measurement nodes outside Belgium. Atlas provides an API that enables us to perform measurements from any RIPE Atlas node. This measurement will give you more information about the access to the website that you analyse from other countries. We will run the measurement script on Monday Nov 24th. You can request measurements from RIPE Atlas nodes by adding the DNS names for which you need information on the course wiki. The measurement results will be available in JSON format from the RIPE Atlas website.
+
+
+====
+
+Third week TCP
+
+====
+
+The Transmission Control Protocol (TCP) plays a key role in the delivery of information from web servers. By collecting a trace of all packets exchanged between your client and the web server that you monitor, you will be able to understand in more details whether TCP has been tuned to improve the performance of this web server. There are several improvements that you could detect, e.g. :
+
+the number of parallel TCP connections established by your browser to each web server. Most browsers have a configurable limit for this number and will limit the number of connections to a given domain name. Some web servers will use different domain names for the same physical server to increase the number of TCP connections.
+the TCP options (window scale - look at the scaling factor, selective acknowledgements, timestamps, explicit congestion notifications, TCP fast open, multipath TCP - unlikely). You can see which option is negotiated in the three way handshake.
+the initial value of the congestion window.  This initial window has an impact on the performance for short requests, see http://www.cdnplanet.com/blog/initcwnd-settings-major-cdn-providers/
+the performance of the different TCP connections. tcptrace http://www.tcptrace.org can give your more statistics on the performance of each connection, such as retransmissions, round-trip-time, maximum window, ...
+If your web server supports both IPv6 and IPv4 (look at the DNS queries), your browser might use happy eyeballs (https://tools.ietf.org/html/rfc6555). This is a technique that allows the client to try first one address family and then the other to detect which is the fastest one.
+Do the TCP connections with the web server terminate by exchanging FINs or with RST segments sent by the client or the server ?
+
+RIPE Atlas
+
+
+Hello,
+
+The results of the RIPE Atlas probes measurements for your domain names are available in the Documents section of iCampus.
+Two files are available:
+
+1. ripe_atlas_dns.txt.bz2
+This compressed file contains the parsed results of the measurements and organizes as follows:
+
+The building block <block> is:
+
+;QUESTION
+<query>
+;ANSWER
+<response>
+;AUTHORITY
+<authority>
+;ADDITIONAL
+<additional>
+<empty line>
+
+Each <block> represents the response of a probe to a single query. The different queries are organized as follows:
+
+<block>
+<separator>
+<empty line>
+<block>
+<separator>
+<empty line>
+...
+
+The <separator> is the string "----------"
+
+Here is an example of two requests (01net.com. IN A and 01net.com. IN NS), with a single response for each query:
+
+;QUESTION
+01net.com. IN A
+;ANSWER
+01net.com. 33200 IN A 176.31.6.199
+;AUTHORITY
+01net.com. 33200 IN NS a.ns.mailclub.fr.
+01net.com. 33200 IN NS b.ns.mailclub.eu.
+01net.com. 33200 IN NS c.ns.mailclub.com.
+;ADDITIONAL
+
+----------
+
+;QUESTION
+01net.com. IN NS
+;ANSWER
+01net.com. 86400 IN NS b.ns.mailclub.eu.
+01net.com. 86400 IN NS c.ns.mailclub.com.
+01net.com. 86400 IN NS a.ns.mailclub.fr.
+;AUTHORITY
+;ADDITIONAL
+b.ns.mailclub.eu. 78822 IN A 85.31.196.158
+b.ns.mailclub.eu. 63255 IN AAAA 2a01:240:101::158
+c.ns.mailclub.com. 66661 IN A 87.255.159.64
+c.ns.mailclub.com. 66027 IN AAAA 2001:470:1f13:aee:a::92
+a.ns.mailclub.fr. 61034 IN A 195.64.164.8
+a.ns.mailclub.fr. 67061 IN AAAA 2a03:1780:1:12:a::8
+
+----------
+
+2. ripe_atlas_msm.tar.bz2
+
+This archive contains a directory containing the raw measurements of the probes.
+The files inside the archive are named as follows: <id>.meta and <id>.result
+<id> is the measurement ID. The meta file contains information about the measurement
+details (query type, etc) and the result file contains the results from all the probes.
+It is encoded in JSON format and documentation about the structure is available at
+https://atlas.ripe.net/docs/data_struct/#v4610_dns.
+
+NOTE: you probably do not want to directly use these raw results, there are only present
+if you wish to perform additional analysis (e.g. if you wish to know correlate the different
+results with probe location, etc).
+
+
