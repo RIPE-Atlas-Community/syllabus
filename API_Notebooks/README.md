@@ -1,7 +1,7 @@
-# Jupiter notebook with RIPE Atlas API examples
+# Jupyter notebook with RIPE Atlas API examples
 
 ## Installation prerequisites
-   To use this notebook you need to have a modern browser, python2, Ipython([Jupiter](https://jupyter.org/)) notebook, and number of python modules.
+   To use this notebook you need to have a modern browser, python2, Ipython([Jupyter](https://jupyter.org/)) notebook, and number of python modules.
    
    For new users it is advised to install [Anaconda](https://www.continuum.io/downloads)
 
@@ -22,6 +22,6 @@
  
  If you're having problems installing `ripe.atlas.sagan` please consult with the [sagan documentation](https://github.com/RIPE-NCC/ripe.atlas.sagan/blob/master/README.rst#troubleshooting)
 
-## Run jupiter
+## Run Jupyter
  * `$ jupyter notebook`
  * in newly opened browser window upload atlas.ipynb and start experimenting!
