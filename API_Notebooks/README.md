@@ -22,6 +22,6 @@
  
  If you're having problems installing `ripe.atlas.sagan` please consult with the [sagan documentation](https://github.com/RIPE-NCC/ripe.atlas.sagan/blob/master/README.rst#troubleshooting)
 
-## run jupiter
+## Run jupiter
  * `$ jupyter notebook`
  * in newly opened browser window upload atlas.ipynb and start experimenting!
